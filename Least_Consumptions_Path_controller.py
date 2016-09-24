@@ -133,13 +133,13 @@ class SimpleSwitch13(app_manager.RyuApp):
         self.mac_to_port.setdefault(dpid, {})
         dst = eth.dst
         src = eth.src
-        path_found = False
+        is_path_found = False
         path_id = 0
         # learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port
         hosts = [host.mac for host in get_host(self)]
 
-        if src not in self.net and path_found is False and src in hosts:
+        if src not in self.net and is_path_found is False and src in hosts:
             try:
                 weight = abs(self.monitor.port_upload[(dpid, in_port)][-1])
             except:
@@ -170,9 +170,9 @@ class SimpleSwitch13(app_manager.RyuApp):
                     next_dpid = path_dpids[path_dpids.index(dpid) + 1]
                     out_port = self.net[dpid][next_dpid]['port']
                     path_id = path_id
-                    is_path_found = True
+                    is_is_path_found = True
 
-        if dst in self.net and path_found is False:
+        if dst in self.net and is_path_found is False:
             self.refresh_topology_data()
             if nx.has_path(self.net, src, dst):
                 new_path = nx.dijkstra_path(self.net,src,dst)
@@ -186,7 +186,7 @@ class SimpleSwitch13(app_manager.RyuApp):
             else:
                 out_port = ofproto.OFPP_FLOOD
 
-        elif path_found is False:
+        elif is_path_found is False:
             out_port = ofproto.OFPP_FLOOD
 
         actions = [parser.OFPActionOutput(out_port)]
