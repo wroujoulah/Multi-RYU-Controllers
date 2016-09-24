@@ -107,8 +107,6 @@ class SimpleSwitch13(app_manager.RyuApp):
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):
-        # If you hit this you might want to increase
-        # the "miss_send_length" of your switch
         if ev.msg.msg_len < ev.msg.total_len:
             self.logger.debug("packet truncated: only %s of %s bytes",
                               ev.msg.msg_len, ev.msg.total_len)
@@ -126,7 +124,6 @@ class SimpleSwitch13(app_manager.RyuApp):
         src = eth.src
         is_path_found = False
         path_id = 0
-        # learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port
         hosts = [host.mac for host in get_host(self)]
 
