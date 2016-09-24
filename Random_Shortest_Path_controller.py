@@ -90,6 +90,9 @@ class SimpleSwitch13(app_manager.RyuApp):
         switch_list = get_switch(self, None)
         switches = [switch.dp.id for switch in switch_list]
         self.net.add_nodes_from(switches)
+        links_list = get_link(self, None)
+        for link in links_list:
+            self.net.add_edge(link.src.dpid, link.dst.dpid, {'port':link.src.port_no})
         try:
             hosts = [host.mac for host in get_host(self)]
             for (src, dst, data) in self.net.edges(data=True):

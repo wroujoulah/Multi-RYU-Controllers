@@ -76,12 +76,11 @@ class SimpleSwitch13(app_manager.RyuApp):
                                     match=match, hard_timeout=hard_timeout, idle_timeout=idle_timeout, instructions=inst)
         datapath.send_msg(mod)
 
-    def delete_flow(self, datapath, path_id):
+    def delete_flow(self, datapath, path_id, table_id=0):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
         match = parser.OFPMatch()
         cookie = cookie_mask = path_id
-        table_id = 0
         command = ofproto.OFPFC_DELETE
         out_port = ofproto.OFPP_ANY
         out_group = ofproto.OFPG_ANY
@@ -95,20 +94,14 @@ class SimpleSwitch13(app_manager.RyuApp):
         self.net.add_nodes_from(switches)
         links_list = get_link(self, None)
         for link in links_list:
-            try:
-                weight = abs(self.monitor.port_upload[(link.src.dpid, link.src.port_no)][-1])
-
-            except:
-                weight = 0
-            self.net.add_edge(link.src.dpid, link.dst.dpid, {'port':link.src.port_no}, weight=weight)
+            self.net.add_edge(link.src.dpid, link.dst.dpid, {'port':link.src.port_no})
 
         try:
             hosts = [host.mac for host in get_host(self)]
             for (src, dst, data) in self.net.edges(data=True):
                 try:
                     if dst in hosts:
-                        weight = abs(self.monitor.port_upload[(src,data['port'])][-1])
-                        self.net.add_edge(src, dst, {'port': data['port']}, weight=weight)
+                        self.net.add_edge(src, dst, {'port': data['port']})
                 except:
                     self.logger.debug("error %s ", src)
             return
@@ -141,15 +134,10 @@ class SimpleSwitch13(app_manager.RyuApp):
         hosts = [host.mac for host in get_host(self)]
         if src not in self.net and is_path_found is False \
                 and src in hosts:
-            
-            try:
-                weight = abs(self.monitor.port_upload[(dpid, in_port)][-1])
-            except:
-                weight = 0
-                
+
             self.net.add_node(src)
-            self.net.add_edge(dpid, src, {'port': in_port}, weight=weight)
-            self.net.add_edge(src, dpid, weight=weight)
+            self.net.add_edge(dpid, src, {'port': in_port})
+            self.net.add_edge(src, dpid)
 
         # ignore lldp packet
         if eth.ethertype == ether_types.ETH_TYPE_LLDP:
@@ -218,11 +206,7 @@ class SimpleSwitch13(app_manager.RyuApp):
         self.net.add_nodes_from(switches)
         links_list = get_link(self, None)
         for link in links_list:
-            try:
-                weight = abs(self.monitor.port_upload[(link.src.dpid, link.src.port_no)][-1])
-            except:
-                weight = 0
-            self.net.add_edge(link.src.dpid, link.dst.dpid, {'port': link.src.port_no}, weight=weight)
+            self.net.add_edge(link.src.dpid, link.dst.dpid, {'port': link.src.port_no})
 
     @set_ev_cls(event.EventSwitchLeave)
     def get_new_topology_data(self, ev):
