@@ -205,9 +205,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contributors
 
-- Mhd Wissam Alroujoulah ([@wroujoulah](https://github.com/wroujoulah))
 - Abdulhadi Bitar
 - Eyad Arnabeh
+- Mhd Wissam Alroujoulah ([@wroujoulah](https://github.com/wroujoulah))
 
 ## Acknowledgments
 
